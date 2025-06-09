@@ -1,0 +1,110 @@
+/* client/src/components/Navbar.css */
+.navbar {
+  background-color: #333;
+  padding: 1rem 0;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.navbar-logo {
+  color: white;
+  text-decoration: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.nav-menu {
+  list-style: none;
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  margin-left: 20px;
+}
+
+.nav-links {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.nav-links:hover {
+  color: #add8e6; /* Light blue on hover */
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f4f7f6; /* Light background for the whole app */
+}
+
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 20px auto;
+}
+
+/* Navbar Styles */
+.navbar {
+  background-color: #343a40; /* Darker charcoal grey for Navbar background */
+  padding: 15px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.navbar-brand h1 {
+  color: #e9ecef; /* Light grey for app name */
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: bold;
+}
+
+.nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 30px; /* Space between navigation items */
+}
+
+.nav-links li a {
+  color: #adb5bd; /* Lighter grey for inactive links */
+  text-decoration: none;
+  font-size: 1.1em;
+  font-weight: 500;
+  padding: 5px 0;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+  position: relative; /* Needed for the underline effect */
+}
+
+.nav-links li a:hover {
+  color: #ffffff; /* White on hover */
+}
+
+/* Active Link Indicator */
+.nav-links li .active-link {
+  color: #ffffff; /* White for active link */
+  border-bottom: 3px solid #007bff; /* Blue underline indicator */
+  font-weight: 600; /* Make active link bolder */
+}
