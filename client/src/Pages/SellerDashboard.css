@@ -1,169 +1,141 @@
+/* client/src/pages/SellerDashboard.css */
+
 .seller-dashboard-container {
-  padding: 20px;
-  max-width: 900px;
-  margin: 20px auto;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 30px;
+.seller-dashboard-container h1 {
+    text-align: center;
+    color: #34495e;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
 }
 
+/* Sections for Create Product and Manage Products */
 .create-product-section,
 .manage-products-section {
-  margin-bottom: 40px;
-  padding: 25px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #fcfcfc;
+    margin-bottom: 40px;
+    padding: 25px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #fafafa;
 }
 
 .create-product-section h2,
 .manage-products-section h2 {
-  color: #555;
-  margin-top: 0;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
+    color: #34495e;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ecf0f1;
+    padding-bottom: 10px;
 }
 
-.product-form .form-group {
-  margin-bottom: 18px;
+/* Product Form Styles */
+.product-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns for layout */
+    gap: 20px; /* Space between grid items */
 }
 
-.product-form label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #666;
+/* Adjustments for smaller screens, single column */
+@media (max-width: 768px) {
+    .product-form {
+        grid-template-columns: 1fr;
+    }
 }
 
-.product-form input[type="text"],
-.product-form input[type="number"],
-.product-form input[type="url"],
-.product-form textarea,
-.product-form select {
-  width: calc(100% - 20px);
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 1em;
-  box-sizing: border-box;
-  transition: border-color 0.3s;
+/* Specific form group alignment */
+.product-form .form-group:nth-child(even) {
+    /* Optional: styles for even-numbered form groups if you want specific alignment */
 }
 
-.product-form input:focus,
-.product-form textarea:focus,
-.product-form select:focus {
-  border-color: #007bff;
-  outline: none;
+/* Submit button spans both columns */
+.product-form button[type="submit"],
+.product-form button.cancel-button {
+    grid-column: span 2; /* Span across both columns */
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    margin-top: 10px;
+}
+@media (max-width: 768px) {
+    .product-form button[type="submit"],
+    .product-form button.cancel-button {
+        grid-column: span 1; /* Back to single column on small screens */
+    }
 }
 
-.product-form textarea {
-  resize: vertical;
-  min-height: 80px;
+/* Product Management Table */
+.product-table-container {
+    overflow-x: auto; /* Enables horizontal scrolling on small screens */
 }
 
-.submit-button {
-  background-color: #28a745;
-  color: white;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1.1em;
-  transition: background-color 0.3s;
+.product-management-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-.submit-button:hover {
-  background-color: #218838;
+.product-management-table th,
+.product-management-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    vertical-align: middle;
 }
 
-.form-message {
-  margin-top: 15px;
-  padding: 10px;
-  border-radius: 5px;
-  font-weight: bold;
+.product-management-table th {
+    background-color: #f2f2f2;
+    color: #555;
+    font-weight: 600;
 }
 
-.success-message {
-  color: #28a745;
-  background-color: #e6ffe6;
-  border: 1px solid #28a745;
+.product-management-table tr:nth-child(even) {
+    background-color: #f9f9f9;
 }
 
-.error-message {
-  color: #dc3545;
-  background-color: #ffe6e6;
-  border: 1px solid #dc3545;
+.product-management-table tr:hover {
+    background-color: #f1f1f1;
 }
 
-.manage-products-section {
-  margin-top: 40px;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+.product-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
 }
 
-.product-management-list {
-  list-style: none;
-  padding: 0;
+.actions-cell {
+    white-space: nowrap; /* Prevent buttons from wrapping */
 }
 
-.product-management-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.product-management-item:last-child {
-  border-bottom: none;
-}
-
-.product-name {
-  font-weight: bold;
-  flex-grow: 1;
-  color: #444;
-}
-
-.product-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.button {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9em;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
-  white-space: nowrap;
+.action-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    text-decoration: none; /* For Link acting as button */
+    display: inline-block; /* For Link acting as button */
+    text-align: center;
 }
 
 .edit-button {
-  background-color: #007bff;
-  color: white;
+    background-color: #ffc107;
+    color: #333;
 }
 
 .edit-button:hover {
-  background-color: #0056b3;
+    background-color: #e0a800;
 }
 
 .delete-button {
-  background-color: #dc3545;
-  color: white;
+    background-color: #dc3545;
+    color: white;
 }
 
 .delete-button:hover {
-  background-color: #c82333;
+    background-color: #c82333;
 }

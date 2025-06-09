@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import '../App.css';
 import './SellerDashboard.css';
 
@@ -11,37 +10,63 @@ const SellerDashboard = () => {
   const [category, setCategory] = useState('');
   const [brand, setBrand] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const [products, setProducts] = useState([]);
-  const [fetchError, setFetchError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
+
+  const [editingProduct, setEditingProduct] = useState(null);
+
+  const [fetchedCategories, setFetchedCategories] = useState([]);
+  const [fetchedBrands, setFetchedBrands] = useState([]);
 
   const apiUrl = 'http://localhost:5001/api/products';
 
-  const categories = [
-    'Electronics', 'Home & Office', 'Footwear', 'Sports & Outdoors', 'Home & Kitchen'
-  ];
-  const brands = [
-    'Acer', 'Sony', 'Herman Miller', 'Apple', 'Nike',
-    'Keurig', 'Canon', 'Lululemon', 'JBL', 'T-fal'
-  ];
-
   useEffect(() => {
-    fetchProducts();
+    const fetchInitialData = async () => {
+      setLoading(true);
+      setFetchError(null);
+
+      try {
+        const productsRes = await axios.get(apiUrl);
+        setProducts(productsRes.data.products || []);
+
+        const [categoriesRes, brandsRes] = await Promise.all([
+          axios.get('http://localhost:5001/api/categories'),
+          axios.get('http://localhost:5001/api/brands')
+        ]);
+        setFetchedCategories(categoriesRes.data.categories);
+        setFetchedBrands(brandsRes.data.brands);
+
+      } catch (err) {
+        console.error('Error fetching initial data:', err);
+        setFetchError('Failed to load products or filter options. Please try again.');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
   }, []);
 
-  const fetchProducts = async () => {
-    setFetchError('');
-    try {
-      const response = await axios.get(apiUrl);
-      setProducts(response.data.products || []);
-    } catch (err) {
-      console.error('Error fetching products for seller dashboard:', err);
-      setFetchError('Failed to load products for management.');
-      setProducts([]);
+  useEffect(() => {
+    const refreshProducts = async () => {
+      try {
+        const response = await axios.get(apiUrl);
+        setProducts(response.data.products || []);
+      } catch (err) {
+        console.error('Error re-fetching products after operation:', err);
+      }
+    };
+
+    if (message || error) {
+      refreshProducts();
     }
-  };
+  }, [message, error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,51 +74,83 @@ const SellerDashboard = () => {
     setError('');
 
     if (!productName || !description || !price || !category || !brand) {
-      setError('Please fill in all required fields for adding a product.');
+      setError('Please fill in all required fields.');
       return;
     }
 
+    const productData = {
+      name: productName,
+      description,
+      price: parseFloat(price),
+      category,
+      brand,
+      imageUrl,
+      countInStock: 10,
+    };
+
     try {
-      const newProduct = {
-        name: productName,
-        description,
-        price: parseFloat(price),
-        category,
-        brand,
-        imageUrl,
-        countInStock: 10,
-      };
+      let response;
+      if (editingProduct) {
+        response = await axios.put(`${apiUrl}/${editingProduct._id}`, productData);
+        setMessage(`Product "${response.data.product.name}" updated successfully!`);
+      } else {
+        response = await axios.post(apiUrl, productData);
+        setMessage(`Product "${response.data.product.name}" added successfully!`);
+      }
 
-      const response = await axios.post(apiUrl, newProduct);
-
-      setMessage(`Product "${response.data.product.name}" added successfully!`);
       setProductName('');
       setDescription('');
       setPrice('');
       setCategory('');
       setBrand('');
       setImageUrl('');
+      setEditingProduct(null);
 
-      fetchProducts();
     } catch (err) {
-      console.error('Error adding product:', err.response ? err.response.data : err.message);
-      setError(`Error adding product: ${err.response ? err.response.data.message : err.message}`);
+      console.error('Error submitting product:', err.response ? err.response.data : err.message);
+      setError(`Error submitting product: ${err.response?.data?.message || err.message}`);
     }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
+      setMessage('');
+      setError('');
       try {
-        const response = await axios.delete(`${apiUrl}/${id}`);s
-        setMessage(response.data.message || 'Product deleted successfully!'); // Set success message
-        setError(''); // Clear any previous errors
-        fetchProducts(); // Refresh the product list after deletion
+        const response = await axios.delete(`${apiUrl}/${id}`);
+        setMessage(response.data.message || 'Product deleted successfully!');
       } catch (err) {
-        console.error('Error deleting product:', err);
-        setError(err.response?.data?.message || 'Error deleting product.'); // Set error message
-        setMessage(''); // Clear any previous success messages
+        console.error('Error deleting product:', err.response ? err.response.data : err.message);
+        setError(err.response?.data?.message || 'Error deleting product.');
       }
     }
+  };
+
+  const handleEdit = (product) => {
+    setProductName(product.name);
+    setDescription(product.description);
+    setPrice(product.price);
+    setCategory(product.category);
+    setBrand(product.brand);
+    setImageUrl(product.imageUrl || '');
+
+    setEditingProduct(product);
+
+    setMessage(`Now editing "${product.name}". Make your changes and click 'Save Changes'.`);
+    setError('');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    setProductName('');
+    setDescription('');
+    setPrice('');
+    setCategory('');
+    setBrand('');
+    setImageUrl('');
+    setEditingProduct(null);
+    setMessage('');
+    setError('');
   };
 
   return (
@@ -101,7 +158,7 @@ const SellerDashboard = () => {
       <h1>Seller Dashboard</h1>
 
       <section className="create-product-section">
-        <h2>List a New Product</h2>
+        <h2>{editingProduct ? `Edit Product: ${editingProduct.name}` : 'List a New Product'}</h2>
         {message && <p className="success-message">{message}</p>}
         {error && <p className="error-message">{error}</p>}
         <form onSubmit={handleSubmit} className="product-form">
@@ -137,31 +194,39 @@ const SellerDashboard = () => {
           </div>
           <div className="form-group">
             <label htmlFor="category">Category:</label>
-            <select
+            <input
+              type="text"
               id="category"
+              list="categories-list" 
+              placeholder="Select or type a category" // 
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               required
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
+            />
+            
+            <datalist id="categories-list">
+              {fetchedCategories.map((cat) => (
+                <option key={cat} value={cat} /> 
               ))}
-            </select>
+            </datalist>
           </div>
           <div className="form-group">
             <label htmlFor="brand">Brand:</label>
-            <select
+            <input
+              type="text"
               id="brand"
+              list="brands-list" 
+              placeholder="Select or type a brand"
               value={brand}
               onChange={(e) => setBrand(e.target.value)}
               required
-            >
-              <option value="">Select Brand</option>
-              {brands.map((b) => (
-                <option key={b} value={b}>{b}</option>
+            />
+            
+            <datalist id="brands-list">
+              {fetchedBrands.map((b) => (
+                <option key={b} value={b} />
               ))}
-            </select>
+            </datalist>
           </div>
           <div className="form-group">
             <label htmlFor="imageUrl">Image URL:</label>
@@ -173,34 +238,59 @@ const SellerDashboard = () => {
               placeholder="e.g., https://example.com/image.jpg"
             />
           </div>
-          <button type="submit" className="submit-button">Add Product</button>
+          <button type="submit" className="submit-button">
+            {editingProduct ? 'Save Changes' : 'Add Product'}
+          </button>
+          {editingProduct && (
+            <button type="button" onClick={handleCancelEdit} className="submit-button cancel-button">
+              Cancel Edit
+            </button>
+          )}
         </form>
       </section>
 
       <section className="manage-products-section">
-        <h2>Manage Your Products</h2>
+        <h2>Your Listed Products</h2>
+        {loading && <p>Loading products...</p>}
         {fetchError && <p className="error-message">{fetchError}</p>}
-        {products.length === 0 ? (
+        {!loading && !fetchError && products.length === 0 ? (
           <p>No products to manage. Add some using the form above!</p>
         ) : (
-          <ul className="product-management-list">
-            {products.map((product) => (
-              <li key={product._id} className="product-management-item">
-                <span className="product-name">{product.name}</span>
-                <div className="product-actions">
-                  <Link to={`/edit-product/${product._id}`} className="button edit-button">
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(product._id)}
-                    className="button delete-button"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <div className="product-table-container">
+            <table className="product-management-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Brand</th>
+                  <th>Price</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product._id}>
+                    <td>
+                      <img
+                        src={product.imageUrl || 'https://via.placeholder.com/50'}
+                        alt={product.name}
+                        className="product-thumb"
+                      />
+                    </td>
+                    <td>{product.name}</td>
+                    <td>{product.category}</td>
+                    <td>{product.brand}</td>
+                    <td>${product.price ? product.price.toFixed(2) : 'N/A'}</td>
+                    <td className="actions-cell">
+                      <button onClick={() => handleEdit(product)} className="action-button edit-button">Edit</button>
+                      <button onClick={() => handleDelete(product._id)} className="action-button delete-button">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </div>

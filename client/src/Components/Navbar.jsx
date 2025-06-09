@@ -1,32 +1,27 @@
-// client/src/components/Navbar.jsx
-
+// client/src/components/Navbar.jsx (Example)
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import './Navbar.css'; // Make sure this import is there!
 
 const Navbar = () => {
-  const location = useLocation();
-
-  const isActive = (path) => {
-    return location.pathname === path ? 'active-link' : '';
-  };
-
   return (
-    <nav className="navbar"> {/* This 'nav' element gets the main dark background */}
-      <div className="navbar-container"> {/* This 'div' controls internal layout */}
-        <Link to="/" className="navbar-brand">
-          <h1>ShopSphere</h1> {/* Your app name */}
+    <nav className="navbar">
+      <div className="navbar-container">
+        <Link to="/" className="navbar-logo">
+          ShopSphere
         </Link>
-        <ul className="nav-links"> {/* These are your navigation links */}
-          <li>
-            <Link to="/" className={isActive('/')}>
+        <ul className="nav-menu">
+          <li className="nav-item">
+            <Link to="/products" className="nav-links">
               Browse Products
             </Link>
           </li>
-          <li>
-            <Link to="/seller-dashboard" className={isActive('/seller-dashboard')}>
+          <li className="nav-item">
+            <Link to="/seller-dashboard" className="nav-links">
               Seller Dashboard
             </Link>
           </li>
+          {/* Add more nav items here if needed */}
         </ul>
       </div>
     </nav>

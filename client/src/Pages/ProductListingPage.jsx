@@ -14,33 +14,96 @@ const ProductListingPage = () => {
   const [maxPrice, setMaxPrice] = useState('');
   const [selectedBrand, setSelectedBrand] = useState('');
 
+  // NEW: Debounced states for price inputs
+  const [debouncedMinPrice, setDebouncedMinPrice] = useState('');
+  const [debouncedMaxPrice, setDebouncedMaxPrice] = useState('');
+
+  // States for dynamically fetched categories and brands for filters
+  const [fetchedCategories, setFetchedCategories] = useState([]);
+  const [fetchedBrands, setFetchedBrands] = useState([]);
+
   const apiUrl = 'http://localhost:5001/api/products';
 
-  const categories = [
-    'Electronics', 'Books', 'Home & Kitchen', 'Footwear', 'Sports & Outdoors', 'Home & Office'
-  ];
-  const brands = [
-    'Acer', 'Sony', 'Herman Miller', 'Apple', 'Nike',
-    'Keurig', 'Canon', 'Lululemon', 'JBL', 'T-fal'
-  ];
-
+  // OLD useEffect for fetching products (will be modified slightly)
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm, selectedCategory, minPrice, maxPrice, selectedBrand]);
+    // NOW DEPENDS ON DEBOUNCED PRICE STATES
+  }, [searchTerm, selectedCategory, debouncedMinPrice, debouncedMaxPrice, selectedBrand]); // <-- UPDATED DEPENDENCIES
+
+  // NEW: Debounce useEffect for minPrice
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedMinPrice(minPrice);
+    }, 500); // 500ms delay
+
+    // Cleanup function: This runs if minPrice changes before the timeout
+    // or if the component unmounts. It clears the previous timeout.
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [minPrice]); // This effect only runs when minPrice changes
+
+  // NEW: Debounce useEffect for maxPrice
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedMaxPrice(maxPrice);
+    }, 500); // 500ms delay
+
+    // Cleanup function
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [maxPrice]); // This effect only runs when maxPrice changes
+
+
+  // useEffect to fetch dynamic categories and brands for the filter dropdowns on initial load
+  useEffect(() => {
+    const fetchDynamicFilters = async () => {
+      try {
+        const [categoriesRes, brandsRes] = await Promise.all([
+          axios.get('http://localhost:5001/api/categories'),
+          axios.get('http://localhost:5001/api/brands')
+        ]);
+        setFetchedCategories(categoriesRes.data.categories);
+        setFetchedBrands(brandsRes.data.brands);
+      } catch (err) {
+        console.error('Error fetching dynamic categories/brands for filters:', err);
+        // Optionally set a message for the user if filter options fail to load
+      }
+    };
+    fetchDynamicFilters();
+  }, []); // Empty dependency array means this runs only once on component mount
+
 
   const fetchProducts = async () => {
     setLoading(true);
-    setError('');
+    setError(''); // Clear previous errors
     try {
       const params = {};
       if (searchTerm) params.name = searchTerm;
       if (selectedCategory) params.category = selectedCategory;
-      if (minPrice) params.minPrice = minPrice;
-      if (maxPrice) params.maxPrice = maxPrice;
+      // NOW USE DEBOUNCED PRICE STATES FOR THE API CALL
+      if (debouncedMinPrice) params.minPrice = debouncedMinPrice;
+      if (debouncedMaxPrice) params.maxPrice = debouncedMaxPrice;
       if (selectedBrand) params.brand = selectedBrand;
 
+      // Debugging: Log the parameters being sent
+      console.log("Fetching products with params:", params);
+
       const response = await axios.get(apiUrl, { params });
-      setProducts(response.data.products);
+
+      // Debugging: Log the full response data
+      console.log("API Response Data:", response.data);
+
+      // Ensure that response.data.products exists and is an array
+      if (response.data && Array.isArray(response.data.products)) {
+        setProducts(response.data.products);
+      } else {
+        // If data structure is unexpected, treat as empty
+        console.warn("API response.data.products was not an array or was missing:", response.data);
+        setProducts([]);
+      }
+
     } catch (err) {
       console.error('Error fetching products:', err);
       setError('Failed to load products. Please try again later.');
@@ -55,14 +118,17 @@ const ProductListingPage = () => {
     setMinPrice('');
     setMaxPrice('');
     setSelectedBrand('');
+    // The debounced states will also clear themselves via their useEffects
+    // as minPrice/maxPrice become empty strings.
   };
 
+  // Conditional rendering for loading and error states
   if (loading) {
-    return <div className="product-listing-page">Loading products...</div>;
+    return <div className="product-listing-page"><p>Loading products...</p></div>;
   }
 
   if (error) {
-    return <div className="product-listing-page error-message">{error}</div>;
+    return <div className="product-listing-page error-message"><p>{error}</p></div>;
   }
 
   return (
@@ -93,7 +159,8 @@ const ProductListingPage = () => {
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
               <option value="">All Categories</option>
-              {categories.map((cat) => (
+              {/* Use dynamically fetched categories here */}
+              {fetchedCategories.map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
@@ -107,7 +174,8 @@ const ProductListingPage = () => {
               onChange={(e) => setSelectedBrand(e.target.value)}
             >
               <option value="">All Brands</option>
-              {brands.map((brand) => (
+              {/* Use dynamically fetched brands here */}
+              {fetchedBrands.map((brand) => (
                 <option key={brand} value={brand}>{brand}</option>
               ))}
             </select>
@@ -120,7 +188,7 @@ const ProductListingPage = () => {
               id="minPrice"
               placeholder="Min Price"
               value={minPrice}
-              onChange={(e) => setMinPrice(e.target.value)}
+              onChange={(e) => setMinPrice(e.target.value)} // This still updates on every keystroke
             />
           </div>
 
@@ -131,7 +199,7 @@ const ProductListingPage = () => {
               id="maxPrice"
               placeholder="Max Price"
               value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
+              onChange={(e) => setMaxPrice(e.target.value)} // This still updates on every keystroke
             />
           </div>
 
@@ -142,16 +210,17 @@ const ProductListingPage = () => {
 
         <div className="product-content">
           {products.length === 0 ? (
-            <p>No products found matching your criteria.</p>
+            <p className="no-products-message">No products found matching your criteria.</p>
           ) : (
             <div className="product-grid">
               {products.map((product) => (
                 <Link to={`/product/${product._id}`} key={product._id} className="product-card-link">
                   <div className="product-card">
-                    <img src={product.imageUrl} alt={product.name} />
+                    <img src={product.imageUrl || 'https://via.placeholder.com/150'} alt={product.name} />
                     <div className="product-info">
                       <h3>{product.name}</h3>
-                      <p className="product-price">${product.price}</p>
+                      {/* Format price to two decimal places */}
+                      <p className="product-price">${product.price ? product.price.toFixed(2) : 'N/A'}</p>
                     </div>
                   </div>
                 </Link>

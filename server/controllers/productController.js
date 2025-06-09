@@ -1,8 +1,4 @@
-// server/controllers/productController.js
-
-const Product = require('../models/Product'); // Ensure Product model is imported
-
-// Your existing getProducts function (no changes here, just for context)
+const Product = require('../models/Product'); 
 exports.getProducts = async (req, res) => {
   try {
     const { search, category, minPrice, maxPrice, brand } = req.query;
@@ -28,7 +24,7 @@ exports.getProducts = async (req, res) => {
   }
 };
 
-// NEW: Function to get a single product by ID
+//Function to get a single product by ID
 exports.getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id); // Get ID from URL parameters
@@ -74,8 +70,6 @@ exports.updateProduct = async (req, res) => {
         const { id } = req.params; // Get product ID from URL
         const { name, description, price, category, brand, imageUrl, countInStock } = req.body; // Get updated data from request body
 
-        // Basic validation: Check if required fields are present if they are being updated
-        // You can make this more robust depending on which fields are truly optional or required on update
         if (!name || !description || !price || !category || !brand || countInStock === undefined) {
             return res.status(400).json({ message: 'Please provide all required fields for update: name, description, price, category, brand, countInStock.' });
         }
@@ -83,7 +77,7 @@ exports.updateProduct = async (req, res) => {
         const updatedProduct = await Product.findByIdAndUpdate(
             id,
             { name, description, price: parseFloat(price), category, brand, imageUrl, countInStock: parseInt(countInStock) },
-            { new: true, runValidators: true } // new: true returns the updated document, runValidators: true runs schema validators
+            { new: true, runValidators: true } 
         );
 
         if (!updatedProduct) {
@@ -104,13 +98,34 @@ exports.updateProduct = async (req, res) => {
     }
 };
 
-// NEW: Function to create a new product
+exports.getUniqueCategories = async (req, res) => {
+  try {
+    const categories = await Product.distinct('category');
+    console.log('Backend: Fetched unique categories:', categories);
+    res.json({ categories });
+  } catch (err) {
+    console.error('Backend: Error fetching unique categories:', err);
+    res.status(500).json({ message: 'Server Error: Could not fetch unique categories' });
+  }
+};
+
+exports.getUniqueBrands = async (req, res) => {
+  try {
+    const brands = await Product.distinct('brand');
+    console.log('Backend: Fetched unique brands:', brands);
+    res.json({ brands });
+  } catch (err) {
+    console.error('Backend: Error fetching unique brands:', err);
+    res.status(500).json({ message: 'Server Error: Could not fetch unique brands' });
+  }
+};
+
+//Function to create a new product
 exports.createProduct = async (req, res) => {
   try {
     const { name, description, price, category, brand, imageUrl } = req.body;
     console.log('Backend: Received data for new product (POST):', req.body);
 
-    // Basic validation: Check if required fields are present
     if (!name || !description || !price || !category || !brand) {
       return res.status(400).json({ message: 'Please provide all required fields: name, description, price, category, brand.' });
     }
@@ -123,7 +138,7 @@ exports.createProduct = async (req, res) => {
       category,
       brand,
       imageUrl: imageUrl || 'https://via.placeholder.com/150',
-      countInStock: 10, // <--- ADD THIS LINE with a default value (or 0, 1, etc.)
+      countInStock: 10, 
     });
 
     // Save the new product to the database
