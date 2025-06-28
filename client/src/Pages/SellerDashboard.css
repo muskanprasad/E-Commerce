@@ -1,141 +1,231 @@
-/* client/src/pages/SellerDashboard.css */
-
 .seller-dashboard-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .seller-dashboard-container h1 {
-    text-align: center;
-    color: #34495e;
-    margin-bottom: 30px;
-    font-size: 2.5rem;
+  text-align: center;
+  color: #34495e;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
 }
 
-/* Sections for Create Product and Manage Products */
 .create-product-section,
 .manage-products-section {
-    margin-bottom: 40px;
-    padding: 25px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fafafa;
+  margin-bottom: 40px;
+  padding: 25px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
 }
 
 .create-product-section h2,
 .manage-products-section h2 {
-    color: #34495e;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #ecf0f1;
-    padding-bottom: 10px;
+  color: #34495e;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 10px;
 }
 
-/* Product Form Styles */
 .product-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Two columns for layout */
-    gap: 20px; /* Space between grid items */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
-/* Adjustments for smaller screens, single column */
-@media (max-width: 768px) {
-    .product-form {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Specific form group alignment */
-.product-form .form-group:nth-child(even) {
-    /* Optional: styles for even-numbered form groups if you want specific alignment */
-}
-
-/* Submit button spans both columns */
 .product-form button[type="submit"],
 .product-form button.cancel-button {
-    grid-column: span 2; /* Span across both columns */
-    padding: 12px 20px;
-    font-size: 1.1rem;
-    margin-top: 10px;
-}
-@media (max-width: 768px) {
-    .product-form button[type="submit"],
-    .product-form button.cancel-button {
-        grid-column: span 1; /* Back to single column on small screens */
-    }
+  grid-column: span 2;
+  padding: 12px 20px;
+  font-size: 1.1rem;
+  margin-top: 10px;
 }
 
-/* Product Management Table */
 .product-table-container {
-    overflow-x: auto; /* Enables horizontal scrolling on small screens */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .product-management-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  min-width: 600px;
 }
 
 .product-management-table th,
 .product-management-table td {
-    border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
-    vertical-align: middle;
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  vertical-align: middle;
 }
 
 .product-management-table th {
-    background-color: #f2f2f2;
-    color: #555;
-    font-weight: 600;
+  background-color: #f2f2f2;
+  color: #555;
+  font-weight: 600;
 }
 
 .product-management-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 .product-management-table tr:hover {
-    background-color: #f1f1f1;
+  background-color: #f1f1f1;
 }
 
 .product-thumb {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 4px;
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
 }
 
 .actions-cell {
-    white-space: nowrap; /* Prevent buttons from wrapping */
+  white-space: nowrap;
 }
 
 .action-button {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-    border-radius: 4px;
-    text-decoration: none; /* For Link acting as button */
-    display: inline-block; /* For Link acting as button */
-    text-align: center;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  margin: 0 5px 5px 0;
 }
 
 .edit-button {
-    background-color: #ffc107;
-    color: #333;
+  background-color: #ffc107;
+  color: #333;
 }
 
 .edit-button:hover {
-    background-color: #e0a800;
+  background-color: #e0a800;
 }
 
 .delete-button {
-    background-color: #dc3545;
-    color: white;
+  background-color: #dc3545;
+  color: white;
 }
 
 .delete-button:hover {
-    background-color: #c82333;
+  background-color: #c82333;
+}
+
+@media (max-width: 992px) {
+  .seller-dashboard-container {
+    margin: 15px;
+    padding: 15px;
+  }
+
+  .seller-dashboard-container h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+
+  .create-product-section,
+  .manage-products-section {
+    padding: 20px;
+    margin-bottom: 30px;
+  }
+
+  .create-product-section h2,
+  .manage-products-section h2 {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-form {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .product-form button[type="submit"],
+  .product-form button.cancel-button {
+    grid-column: span 1;
+    font-size: 1rem;
+    padding: 10px 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .product-management-table th,
+  .product-management-table td {
+    padding: 10px;
+    font-size: 0.9em;
+  }
+
+  .product-thumb {
+    width: 40px;
+    height: 40px;
+  }
+
+  .action-button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    margin: 0 3px 3px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .seller-dashboard-container {
+    margin: 10px;
+    padding: 10px;
+  }
+
+  .seller-dashboard-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+  }
+
+  .create-product-section,
+  .manage-products-section {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .create-product-section h2,
+  .manage-products-section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+
+  .product-form {
+    gap: 10px;
+  }
+
+  .product-form button[type="submit"],
+  .product-form button.cancel-button {
+    font-size: 0.95rem;
+    padding: 8px 12px;
+  }
+
+  .product-management-table {
+    min-width: 450px;
+  }
+
+  .product-management-table th,
+  .product-management-table td {
+    padding: 8px;
+    font-size: 0.8em;
+  }
+
+  .product-thumb {
+    width: 35px;
+    height: 35px;
+  }
+
+  .action-button {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
 }

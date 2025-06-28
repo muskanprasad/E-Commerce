@@ -1,14 +1,13 @@
-// client/src/pages/EditProductPage.jsx
-
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useParams and useNavigate
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import '../App.css';
-import './EditProductPage.css'; // Optional: create this CSS file
+import './EditProductPage.css';
 
 const EditProductPage = () => {
-  const { id } = useParams(); // Get product ID from URL
-  const navigate = useNavigate(); // For redirection after update
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -17,39 +16,46 @@ const EditProductPage = () => {
     category: '',
     brand: '',
     imageUrl: '',
-    countInStock: '', // Add countInStock
+    countInStock: '',
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
 
   const apiUrl = `http://localhost:5001/api/products/${id}`;
 
   useEffect(() => {
-    const fetchProductData = async () => {
+    const fetchProductAndFilters = async () => {
       setLoading(true);
-      setError('');
       try {
-        const response = await axios.get(apiUrl);
+        const productRes = await axios.get(apiUrl);
         setFormData({
-          name: response.data.name || '',
-          description: response.data.description || '',
-          price: response.data.price || '',
-          category: response.data.category || '',
-          brand: response.data.brand || '',
-          imageUrl: response.data.imageUrl || '',
-          countInStock: response.data.countInStock || 0, // Ensure a default if null/undefined
+          name: productRes.data.name || '',
+          description: productRes.data.description || '',
+          price: productRes.data.price || '',
+          category: productRes.data.category || '',
+          brand: productRes.data.brand || '',
+          imageUrl: productRes.data.imageUrl || '',
+          countInStock: productRes.data.countInStock || 0,
         });
+
+        const [categoriesRes, brandsRes] = await Promise.all([
+          axios.get('http://localhost:5001/api/categories'),
+          axios.get('http://localhost:5001/api/brands')
+        ]);
+        setCategories(categoriesRes.data.categories);
+        setBrands(brandsRes.data.brands);
+
         setLoading(false);
       } catch (err) {
-        console.error('Error fetching product data for edit:', err);
-        setError('Failed to load product for editing. Please check the ID.');
+        console.error('Error fetching product data or filters for edit:', err);
+        toast.error('Failed to load product or categories/brands. Please try again.');
         setLoading(false);
       }
     };
 
     if (id) {
-      fetchProductData();
+      fetchProductAndFilters();
     }
   }, [id, apiUrl]);
 
@@ -59,34 +65,28 @@ const EditProductPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccessMessage('');
     try {
-      const response = await axios.put(apiUrl, formData);
-      setSuccessMessage(response.data.message);
-      console.log('Product updated:', response.data.product);
-      // Optionally redirect to the product detail page or listing page
-      navigate(`/product/${id}`); // Redirect to detail page after update
+      const response = await axios.put(apiUrl, {
+        ...formData,
+        price: parseFloat(formData.price),
+        countInStock: parseInt(formData.countInStock, 10),
+      });
+      toast.success(response.data.message || 'Product updated successfully!');
+      navigate(`/product/${id}`);
     } catch (err) {
-      console.error('Error updating product:', err);
-      setError(err.response?.data?.message || 'Error updating product.');
+      console.error('Error updating product:', err.response ? err.response.data : err.message);
+      toast.error(err.response?.data?.message || 'Error updating product.');
     }
   };
 
   if (loading) {
-    return <div className="edit-product-page">Loading product data...</div>;
+    return <div className="edit-product-page loading-state">Loading product data...</div>;
   }
-
-  if (error && !successMessage) { // Display error if present and no success message
-    return <div className="edit-product-page error-message">{error}</div>;
-  }
-
 
   return (
     <div className="edit-product-page">
       <h2>Edit Product</h2>
-      {successMessage && <p className="success-message">{successMessage}</p>}
-      <form onSubmit={handleSubmit} className="product-form">
+      <form onSubmit={handleSubmit} className="product-edit-form">
         <div className="form-group">
           <label htmlFor="name">Product Name:</label>
           <input
@@ -125,19 +125,20 @@ const EditProductPage = () => {
 
         <div className="form-group">
           <label htmlFor="category">Category:</label>
-          <select
+          <input
+            type="text"
             id="category"
             name="category"
+            list="categories-list"
             value={formData.category}
             onChange={handleChange}
             required
-          >
-            <option value="">Select a Category</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Books">Books</option>
-            <option value="Home & Kitchen">Home & Kitchen</option>
-            {/* Add more categories as needed */}
-          </select>
+          />
+          <datalist id="categories-list">
+            {categories.map((cat) => (
+              <option key={cat} value={cat} />
+            ))}
+          </datalist>
         </div>
 
         <div className="form-group">
@@ -146,10 +147,16 @@ const EditProductPage = () => {
             type="text"
             id="brand"
             name="brand"
+            list="brands-list"
             value={formData.brand}
             onChange={handleChange}
             required
           />
+          <datalist id="brands-list">
+            {brands.map((b) => (
+              <option key={b} value={b} />
+            ))}
+          </datalist>
         </div>
 
         <div className="form-group">
@@ -175,7 +182,10 @@ const EditProductPage = () => {
           />
         </div>
 
-        <button type="submit" className="button submit-button">Update Product</button>
+        <div className="form-actions">
+          <button type="submit" className="button submit-button">Update Product</button>
+          <button type="button" onClick={() => navigate(-1)} className="button cancel-button">Cancel</button>
+        </div>
       </form>
     </div>
   );

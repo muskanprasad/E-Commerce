@@ -1,30 +1,28 @@
-/* client/src/components/Navbar.css */
-
 .navbar {
-  background-color: #34495e; /* Dark blue background */
+  background-color: #34495e;
   height: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 1.2rem;
-  position: sticky; /* Keeps navbar at the top when scrolling */
+  position: sticky;
   top: 0;
-  z-index: 999; /* Ensures it stays on top of other content */
+  z-index: 999;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .navbar-container {
   display: flex;
-  justify-content: space-between; /* Pushes logo to left, menu to right */
+  justify-content: space-between;
   align-items: center;
   height: 80px;
-  max-width: 1300px; /* Max width of the content inside navbar */
+  max-width: 1300px;
   width: 100%;
-  padding: 0 20px; /* Padding on left/right */
+  padding: 0 20px;
 }
 
 .navbar-logo {
-  color: #ecf0f1; /* Light grey for text */
+  color: #ecf0f1;
   justify-self: start;
   margin-left: 20px;
   cursor: pointer;
@@ -37,12 +35,12 @@
 
 .nav-menu {
   display: grid;
-  grid-template-columns: repeat(4, auto); /* Adjust number of columns based on menu items */
-  grid-gap: 10px; /* Space between menu items */
-  list-style: none; /* Removes bullet points */
+  grid-template-columns: repeat(4, auto);
+  grid-gap: 10px;
+  list-style: none;
   text-align: center;
-  width: 60vw; /* Occupy 60% of viewport width */
-  justify-content: end; /* Pushes menu items to the right */
+  width: 60vw;
+  justify-content: end;
   margin-right: 2rem;
 }
 
@@ -60,16 +58,22 @@
   display: flex;
   align-items: center;
   transition: all 0.2s ease-out;
-  border-radius: 5px; /* Rounded corners for links */
+  border-radius: 5px;
 }
 
 .nav-links:hover {
-  background-color: #5d6d7e; /* Slightly lighter blue on hover */
+  background-color: #5d6d7e;
   color: #fff;
   border-radius: 4px;
 }
 
-/* Responsive design for smaller screens */
+.menu-icon {
+  display: none;
+  font-size: 1.8rem;
+  color: #ecf0f1;
+  cursor: pointer;
+}
+
 @media screen and (max-width: 960px) {
   .nav-menu {
     display: flex;
@@ -77,37 +81,107 @@
     width: 100%;
     height: 90vh;
     position: absolute;
-    top: 80px; /* Below the navbar */
-    left: -100%; /* Off-screen by default */
+    top: 80px;
+    left: -100%;
     opacity: 1;
     transition: all 0.5s ease;
     background-color: #34495e;
+    margin-right: 0;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 20px;
   }
 
   .nav-menu.active {
     background: #34495e;
-    left: 0; /* Slide in */
+    left: 0;
     opacity: 1;
     transition: all 0.5s ease;
     z-index: 1;
   }
 
+  .nav-item {
+    width: 100%;
+    height: auto;
+    margin: 10px 0;
+  }
+
   .nav-links {
     text-align: center;
-    padding: 2rem;
-    width: 100%;
-    display: table;
+    padding: 1.5rem;
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+    border-radius: 5px;
   }
 
   .nav-links:hover {
     background-color: #5d6d7e;
-    border-radius: 0;
+    border-radius: 5px;
   }
 
   .navbar-logo {
+    position: static;
+    transform: none;
+    margin-left: 0;
+  }
+
+  .menu-icon {
+    display: block;
     position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(25%, 50%);
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .navbar-container {
+    padding: 0 15px;
+  }
+
+  .navbar-logo {
+    font-size: 1.8rem;
+  }
+
+  .menu-icon {
+    font-size: 1.6rem;
+    right: 15px;
+  }
+
+  .nav-links {
+    padding: 1rem;
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .navbar {
+    height: 70px;
+    font-size: 1rem;
+  }
+
+  .navbar-container {
+    padding: 0 10px;
+    height: 70px;
+  }
+
+  .navbar-logo {
+    font-size: 1.5rem;
+  }
+
+  .menu-icon {
+    font-size: 1.4rem;
+    right: 10px;
+  }
+
+  .nav-menu {
+    top: 70px;
+    height: calc(100vh - 70px);
+  }
+
+  .nav-links {
+    padding: 0.8rem;
+    font-size: 1rem;
   }
 }
